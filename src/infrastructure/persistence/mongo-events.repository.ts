@@ -1,5 +1,5 @@
 import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
-import type { EventsRepository } from '@domain/repositories/events.repository.js';
+import type { EventsRepository } from '@domain/repositories/events.repository.interface.js';
 
 export class MongoEventsRepository implements EventsRepository {
   async storeFeeCollectorEvent(event: ParsedFeeCollectorEvent): Promise<void> {

@@ -1,11 +1,21 @@
-import { PolygonIndexerService } from '@application/services/polygon-indexer.service.js';
-import { PolygonEVMClient } from '@infrastructure/evm/polygon-evm.client.js';
-import { PolygonScheduler } from '@infrastructure/jobs/polygon.scheduler.js';
+import { EVMIndexerService } from '@application/services/evm-indexer.service.js';
+import { EVMClient } from '@infrastructure/evm/evm-client.js';
+import { EVMScheduler } from '@infrastructure/jobs/evm-indexer.scheduler.js';
 
-export function bootstrap() {
-  const polygonClient = new PolygonEVMClient();
-  const polygonIndexer = new PolygonIndexerService(polygonClient);
-  const polygonScheduler = new PolygonScheduler(polygonIndexer);
-  polygonScheduler.start();
-  return { polygonScheduler };
+export async function bootstrap() {
+  await _bootstrapPolygon();
+}
+
+async function _bootstrapPolygon() {
+  const chainConfig = {
+    rpcUrl: 'https://polygon-rpc.com',
+    contractAddress: '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9',
+    blockDelta: 50,
+    initialBlockNumber: 70_000_000,
+    intervalMs: 5_000,
+  };
+  const polygonClient = new EVMClient(chainConfig);
+  const polygonIndexer = new EVMIndexerService(polygonClient);
+  const polygonScheduler = new EVMScheduler(polygonIndexer, chainConfig);
+  await polygonScheduler.start();
 }

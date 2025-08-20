@@ -1,20 +1,17 @@
 import { type BlockTag } from '@ethersproject/abstract-provider';
 import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
-import type { EVMClient } from '@domain/repositories/evm.client.js';
+import type { EVMClient as EVMClientInterface } from '@domain/repositories/evm-client.interface.js';
 import { BigNumber, ethers } from 'ethers';
 import { FeeCollector__factory } from 'lifi-contract-typings';
+import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 
-export class PolygonEVMClient implements EVMClient {
-  // TODO: extract to configuration
-  private static CONTRACT_ADDRESS =
-    '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9';
-  private static POLYGON_RPC = 'https://polygon-rpc.com';
+export class EVMClient implements EVMClientInterface {
   private provider: ethers.providers.JsonRpcProvider;
+  private contractAddress: string;
 
-  constructor() {
-    this.provider = new ethers.providers.JsonRpcProvider(
-      PolygonEVMClient.POLYGON_RPC,
-    );
+  constructor(chainConfig: ChainConfig) {
+    this.provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrl);
+    this.contractAddress = chainConfig.contractAddress;
   }
 
   async fetchFeeCollectorEvents(
@@ -22,7 +19,7 @@ export class PolygonEVMClient implements EVMClient {
     toBlock: BlockTag,
   ): Promise<ParsedFeeCollectorEvent[]> {
     const feeCollector = new ethers.Contract(
-      PolygonEVMClient.CONTRACT_ADDRESS,
+      this.contractAddress,
       FeeCollector__factory.createInterface(),
       this.provider,
     );
