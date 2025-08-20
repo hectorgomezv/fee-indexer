@@ -19,7 +19,11 @@ export class PolygonScheduler {
           error instanceof Error
             ? error.message
             : 'Unexpected throw indexing Polygon events';
-        logger.error({ err: msg, fromBlock, toBlock });
+        const errObj =
+          error instanceof Error
+            ? error
+            : new Error('Unexpected throw indexing Polygon events');
+        logger.error({ err: errObj, fromBlock, toBlock });
       }
     }, INTERVAL_MS);
   }
