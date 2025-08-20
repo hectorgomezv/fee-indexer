@@ -4,7 +4,8 @@ import { logger } from '@infrastructure/logging/logger.js';
 export class PolygonScheduler {
   private static BLOCK_DELTA = 50;
   private static INTERVAL_MS = 2_000;
-  private latestBlock: number = 70000000; // TODO: implement checkpoints.
+  private static INITIAL_BLOCK_NUMBER = 70000000;
+  private latestBlock: number = PolygonScheduler.INITIAL_BLOCK_NUMBER; // TODO: implement checkpoints.
 
   constructor(private polygonIndexerService: PolygonIndexerService) {}
 
