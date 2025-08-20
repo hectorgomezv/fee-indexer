@@ -15,15 +15,9 @@ export class PolygonScheduler {
       try {
         await this.polygonIndexerService.index(fromBlock, toBlock);
       } catch (error) {
-        const msg =
-          error instanceof Error
-            ? error.message
-            : 'Unexpected throw indexing Polygon events';
-        const errObj =
-          error instanceof Error
-            ? error
-            : new Error('Unexpected throw indexing Polygon events');
-        logger.error({ err: errObj, fromBlock, toBlock });
+        const err =
+          error instanceof Error ? error : new Error('Unexpected throw');
+        logger.error({ err, fromBlock, toBlock });
       }
     }, INTERVAL_MS);
   }
