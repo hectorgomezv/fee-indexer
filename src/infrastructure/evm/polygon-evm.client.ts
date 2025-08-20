@@ -9,6 +9,13 @@ export class PolygonEVMClient implements EVMClient {
   private static CONTRACT_ADDRESS =
     '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9';
   private static POLYGON_RPC = 'https://polygon-rpc.com';
+  private provider: ethers.providers.JsonRpcProvider;
+
+  constructor() {
+    this.provider = new ethers.providers.JsonRpcProvider(
+      PolygonEVMClient.POLYGON_RPC,
+    );
+  }
 
   async fetchFeeCollectorEvents(
     fromBlock: BlockTag,
@@ -17,7 +24,7 @@ export class PolygonEVMClient implements EVMClient {
     const feeCollector = new ethers.Contract(
       PolygonEVMClient.CONTRACT_ADDRESS,
       FeeCollector__factory.createInterface(),
-      new ethers.providers.JsonRpcProvider(PolygonEVMClient.POLYGON_RPC),
+      this.provider,
     );
     const filter = feeCollector.filters.FeesCollected();
     const events = await feeCollector.queryFilter(filter, fromBlock, toBlock);
@@ -30,5 +37,13 @@ export class PolygonEVMClient implements EVMClient {
         lifiFee: BigNumber.from(parsedEvent.args[3]),
       };
     });
+  }
+
+  async getLastBlockNumber(): Promise<number> {
+    const block = await this.provider.getBlock('latest');
+    if (!block) {
+      throw new Error('Failed to fetch the latest block number');
+    }
+    return block.number;
   }
 }

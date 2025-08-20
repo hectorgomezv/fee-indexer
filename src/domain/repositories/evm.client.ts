@@ -7,4 +7,6 @@ export interface EVMClient {
     fromBlock: BlockTag,
     toBlock: BlockTag,
   ): Promise<ParsedFeeCollectorEvent[]>;
+
+  getLastBlockNumber(): Promise<number>;
 }

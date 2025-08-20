@@ -3,8 +3,8 @@ import { logger } from '@infrastructure/logging/logger.js';
 
 export class PolygonScheduler {
   private static BLOCK_DELTA = 50;
-  private static INTERVAL_MS = 2_000;
-  private static INITIAL_BLOCK_NUMBER = 70000000;
+  private static INITIAL_BLOCK_NUMBER = 70_000_000;
+  private static INTERVAL_MS = 10_000;
   private latestBlock: number = PolygonScheduler.INITIAL_BLOCK_NUMBER; // TODO: implement checkpoints.
 
   constructor(private polygonIndexerService: PolygonIndexerService) {}
@@ -15,15 +15,19 @@ export class PolygonScheduler {
   }
 
   private async _indexJob() {
-    const latestBlock = this.latestBlock + PolygonScheduler.BLOCK_DELTA; // TODO: implement checkpoints.
-    const fromBlock = latestBlock - PolygonScheduler.BLOCK_DELTA;
-    const toBlock = latestBlock;
+    const lastBlockNumber =
+      await this.polygonIndexerService.getLastBlockNumber();
+    const fromBlock = this.latestBlock;
+    const toBlock = Math.min(
+      this.latestBlock + PolygonScheduler.BLOCK_DELTA,
+      lastBlockNumber,
+    );
     try {
       await this.polygonIndexerService.indexFeeCollectionEvents(
         fromBlock,
         toBlock,
       );
-      this.latestBlock = latestBlock;
+      this.latestBlock = toBlock + 1;
     } catch (error) {
       const err =
         error instanceof Error ? error : new Error('Unexpected throw');

@@ -16,4 +16,8 @@ export class PolygonIndexerService {
     logger.info(`Fetched ${res.length} FeesCollected events`);
     logger.info(res); // TODO: remove events logging
   }
+
+  async getLastBlockNumber(): Promise<number> {
+    return this.polygonClient.getLastBlockNumber();
+  }
 }
