@@ -1,4 +1,4 @@
-import { EVMIndexerService } from '@application/services/evm-indexer.service.js';
+import { type EVMIndexerService } from '@application/services/evm-indexer.service.js';
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 import { logger } from '@infrastructure/logging/logger.js';
 
