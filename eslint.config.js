@@ -29,8 +29,5 @@ export default [
   },
   {
     files: ['**/*.spec.ts'],
-    env: {
-      jest: true,
-    },
   },
 ];
