@@ -1,16 +1,16 @@
-import { type BlockTag } from '@ethersproject/abstract-provider';
+import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
 import type { EVMClient as EVMClientInterface } from '@domain/repositories/evm-client.interface.js';
-import { BigNumber, ethers } from 'ethers';
+import { type BlockTag } from '@ethersproject/abstract-provider';
+import { BigNumber, Contract, providers } from 'ethers';
 import { FeeCollector__factory } from 'lifi-contract-typings';
-import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 
 export class EVMClient implements EVMClientInterface {
-  private provider: ethers.providers.JsonRpcProvider;
+  private provider: providers.JsonRpcProvider;
   private contractAddress: string;
 
   constructor(chainConfig: ChainConfig) {
-    this.provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrl);
+    this.provider = new providers.JsonRpcProvider(chainConfig.rpcUrl);
     this.contractAddress = chainConfig.contractAddress;
   }
 
@@ -18,7 +18,7 @@ export class EVMClient implements EVMClientInterface {
     fromBlock: BlockTag,
     toBlock: BlockTag,
   ): Promise<ParsedFeeCollectorEvent[]> {
-    const feeCollector = new ethers.Contract(
+    const feeCollector = new Contract(
       this.contractAddress,
       FeeCollector__factory.createInterface(),
       this.provider,
