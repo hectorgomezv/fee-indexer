@@ -1,4 +1,4 @@
-import { PolygonIndexerService } from 'application/services/polygon-indexer.service.js';
+import type { PolygonIndexerService } from '@application/services/polygon-indexer.service.js';
 
 export class PolygonScheduler {
   constructor(private polygonIndexerService: PolygonIndexerService) {}
