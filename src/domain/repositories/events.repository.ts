@@ -1,4 +1,4 @@
-import type { ParsedFeeCollectorEvent } from '../entities/parsed-fee-collector-event.entity.js';
+import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
 
 export interface EventsRepository {
   storeFeeCollectorEvent(event: ParsedFeeCollectorEvent): Promise<void>;

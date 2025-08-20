@@ -1,6 +1,6 @@
 import { type BlockTag } from '@ethersproject/abstract-provider';
-import type { ParsedFeeCollectorEvent } from 'domain/entities/parsed-fee-collector-event.entity.js';
-import type { EVMClient } from 'domain/repositories/evm.client.js';
+import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
+import type { EVMClient } from '@domain/repositories/evm.client.js';
 import { BigNumber, ethers } from 'ethers';
 import { FeeCollector__factory } from 'lifi-contract-typings';
 

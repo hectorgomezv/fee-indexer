@@ -1,5 +1,5 @@
+import { bootstrap } from '@container.js';
 import express, { type Application } from 'express';
-import { bootstrap } from './container.js';
 
 export function initApp(): Application {
   const app = express();
