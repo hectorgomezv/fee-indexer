@@ -1,15 +1,15 @@
-import type { EVMClient } from '@domain/repositories/evm.client.js';
+import type { EVMClient } from '@domain/repositories/evm-client.interface.js';
 import { logger } from '@infrastructure/logging/logger.js';
 
-export class PolygonIndexerService {
-  constructor(private polygonClient: EVMClient) {}
+export class EVMIndexerService {
+  constructor(private evmClient: EVMClient) {}
 
   async indexFeeCollectionEvents(
     fromBlock: number,
     toBlock: number,
   ): Promise<void> {
     logger.info(`Indexing from block ${fromBlock} to block ${toBlock}`);
-    const res = await this.polygonClient.fetchFeeCollectorEvents(
+    const res = await this.evmClient.fetchFeeCollectorEvents(
       fromBlock,
       toBlock,
     );
@@ -18,6 +18,6 @@ export class PolygonIndexerService {
   }
 
   async getLastBlockNumber(): Promise<number> {
-    return this.polygonClient.getLastBlockNumber();
+    return this.evmClient.getLastBlockNumber();
   }
 }
