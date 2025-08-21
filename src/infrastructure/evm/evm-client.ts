@@ -1,5 +1,5 @@
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
-import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
+import type { ParsedFeesCollectedEvent } from '@domain/entities/parsed-fees-collected-event.entity.js';
 import type { EVMClient as EVMClientInterface } from '@domain/repositories/evm-client.interface.js';
 import { type BlockTag } from '@ethersproject/abstract-provider';
 import { BigNumber, Contract, providers } from 'ethers';
@@ -14,10 +14,10 @@ export class EVMClient implements EVMClientInterface {
     this.contractAddress = chainConfig.contractAddress;
   }
 
-  async fetchFeeCollectorEvents(
+  async fetchFeesCollectedEvents(
     fromBlock: BlockTag,
     toBlock: BlockTag,
-  ): Promise<ParsedFeeCollectorEvent[]> {
+  ): Promise<ParsedFeesCollectedEvent[]> {
     const feeCollector = new Contract(
       this.contractAddress,
       FeeCollector__factory.createInterface(),

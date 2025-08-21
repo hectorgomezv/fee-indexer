@@ -9,7 +9,7 @@ export class EVMIndexerService {
     toBlock: number,
   ): Promise<void> {
     logger.info(`Indexing from block ${fromBlock} to block ${toBlock}`);
-    const res = await this.evmClient.fetchFeeCollectorEvents(
+    const res = await this.evmClient.fetchFeesCollectedEvents(
       fromBlock,
       toBlock,
     );

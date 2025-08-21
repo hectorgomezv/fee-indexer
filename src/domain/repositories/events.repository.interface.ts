@@ -1,8 +1,8 @@
-import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
+import type { ParsedFeesCollectedEvent } from '@domain/entities/parsed-fees-collected-event.entity.js';
 
 export interface EventsRepository {
-  storeFeeCollectorEvent(event: ParsedFeeCollectorEvent): Promise<void>;
-  findFeeCollectorEventByIntegrator(
-    integrator: ParsedFeeCollectorEvent['integrator'],
-  ): Promise<ParsedFeeCollectorEvent[]>;
+  storeFeesCollectedEvent(event: ParsedFeesCollectedEvent): Promise<void>;
+  findFeesCollectedEventsByIntegrator(
+    integrator: ParsedFeesCollectedEvent['integrator'],
+  ): Promise<ParsedFeesCollectedEvent[]>;
 }

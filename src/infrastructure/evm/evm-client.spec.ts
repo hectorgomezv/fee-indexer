@@ -42,7 +42,7 @@ describe('EVMClient', () => {
     client = new EVMClient(chainConfig);
   });
 
-  describe('fetchFeeCollectorEvents', () => {
+  describe('fetchFeesCollectedEvents', () => {
     it('should return parsed events', async () => {
       const fromBlock = randomInt();
       const toBlock = randomInt();
@@ -57,7 +57,7 @@ describe('EVMClient', () => {
         args: [token, integrator, integratorFee, lifiFee],
       });
 
-      const result = await client.fetchFeeCollectorEvents(fromBlock, toBlock);
+      const result = await client.fetchFeesCollectedEvents(fromBlock, toBlock);
 
       expect(result).toEqual([
         {
@@ -79,7 +79,7 @@ describe('EVMClient', () => {
       const toBlock = randomInt();
       contractMock.queryFilter.mockResolvedValue([]);
 
-      const result = await client.fetchFeeCollectorEvents(fromBlock, toBlock);
+      const result = await client.fetchFeesCollectedEvents(fromBlock, toBlock);
 
       expect(result).toEqual([]);
       expect(contractMock.queryFilter).toHaveBeenCalledWith(
