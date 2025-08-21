@@ -17,10 +17,10 @@ async function _bootstrapPolygon() {
     initialBlockNumber: 70_000_000,
     intervalMs: 5_000,
   };
-  const dbInstance = db.getInstance({
+  db.initializeDatabase({
     uri: process.env.MONGO_URI!,
   });
-  const mongoEventsRepository = new MongoEventsRepository(dbInstance);
+  const mongoEventsRepository = new MongoEventsRepository();
   const polygonClient = new EVMClient(chainConfig);
   const polygonIndexer = new EVMIndexerService(
     polygonClient,

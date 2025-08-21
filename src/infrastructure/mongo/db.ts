@@ -9,11 +9,10 @@ export class db {
     this.connect(dbConfig.uri);
   }
 
-  public static getInstance(dbConfig: DBConfig): db {
+  public static initializeDatabase(dbConfig: DBConfig): void {
     if (!db.instance) {
       db.instance = new db(dbConfig);
     }
-    return db.instance;
   }
 
   private async connect(uri: string): Promise<void> {
@@ -22,6 +21,7 @@ export class db {
       logger.info(`MongoDB ready at ${uri}`);
     } catch (error) {
       logger.error(`MongoDB connection error: ${error}`);
+      throw error; // This is a critical error, it should kill the process
     }
   }
 }

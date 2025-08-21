@@ -16,6 +16,8 @@ export class EVMScheduler {
     this.intervalMs = chainConfig.intervalMs;
   }
 
+  // TODO: add tests
+
   async start(): Promise<void> {
     await this._indexJob();
     setInterval(() => this._indexJob(), this.intervalMs);
@@ -33,6 +35,7 @@ export class EVMScheduler {
       await this.indexerService.indexFeeCollectionEvents(fromBlock, toBlock);
       this.latestBlock = Math.min(toBlock + 1, lastBlockNumber);
     } catch (err) {
+      // TODO: retry strategy?
       logger.error({
         err,
         fromBlock: this.latestBlock,

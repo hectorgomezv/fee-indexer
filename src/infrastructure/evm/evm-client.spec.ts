@@ -6,9 +6,6 @@ import { randomBytes } from 'crypto';
 let contractMock: any;
 let providerMock: any;
 
-const randomAddress = () => `0x${randomBytes(20).toString('hex')}`;
-const randomInt = () => Math.floor(Math.random() * 1000);
-
 vi.mock('ethers', () => {
   return {
     BigNumber: {
@@ -109,3 +106,7 @@ describe('EVMClient', () => {
     });
   });
 });
+
+// Utility functions for test data generation
+const randomAddress = () => `0x${randomBytes(20).toString('hex')}`;
+const randomInt = () => Math.floor(Math.random() * 1000);

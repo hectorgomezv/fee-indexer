@@ -1,5 +1,10 @@
-node_modules
-coverage
-dist
+# Dependencies
+node_modules/
+
+# Outputs
+dist/
+coverage/
+
+# Environment files
 .env
 .env.docker
