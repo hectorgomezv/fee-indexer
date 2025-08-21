@@ -30,7 +30,7 @@ export class EVMScheduler {
     );
     try {
       await this.indexerService.indexFeeCollectionEvents(fromBlock, toBlock);
-      this.latestBlock = toBlock + 1;
+      this.latestBlock = Math.min(toBlock + 1, lastBlockNumber);
     } catch (error) {
       const err =
         error instanceof Error ? error : new Error('Unexpected throw');
