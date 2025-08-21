@@ -9,6 +9,7 @@ export async function bootstrap() {
 }
 
 async function _bootstrapPolygon() {
+  // TODO: abstract away configuration, initialize containers based on an array of ChainConfigs
   const chainConfig = {
     rpcUrl: 'https://polygon-rpc.com',
     contractAddress: '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9',
@@ -17,7 +18,7 @@ async function _bootstrapPolygon() {
     intervalMs: 5_000,
   };
   const dbInstance = db.getInstance({
-    uri: 'mongodb://localhost:27017/fees',
+    uri: process.env.MONGO_URI!,
   });
   const mongoEventsRepository = new MongoEventsRepository(dbInstance);
   const polygonClient = new EVMClient(chainConfig);

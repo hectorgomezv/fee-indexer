@@ -1,6 +1,6 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
-class ParsedFeesCollectedEventSchema {
+class ParsedFeesCollectedEvent {
   @prop({ type: () => String }) public token!: string;
   @prop({ type: () => String }) public integrator!: string;
   @prop({ type: () => String }) public integratorFee!: string;
@@ -8,5 +8,6 @@ class ParsedFeesCollectedEventSchema {
 }
 
 export const ParsedFeesCollectedEventModel = getModelForClass(
-  ParsedFeesCollectedEventSchema,
+  ParsedFeesCollectedEvent,
+  { schemaOptions: { collection: 'fees_collected', timestamps: true } },
 );

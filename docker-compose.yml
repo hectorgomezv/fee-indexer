@@ -1,0 +1,20 @@
+services:
+  mongo:
+    image: mongo:5
+    container_name: 'fee-indexer-mongo'
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_DATA_DIR: /data/db
+      MONGO_LOG_DIR: /dev/null
+    volumes:
+      - mongo_data:/data/db
+  fee-indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'fee-indexer'
+    env_file: .env.docker
+
+volumes:
+  mongo_data:

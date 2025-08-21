@@ -2,6 +2,8 @@ import type { ParsedFeesCollectedEvent } from '@domain/entities/parsed-fees-coll
 import type { EventsRepository } from '@domain/repositories/events.repository.interface.js';
 import { logger } from '@infrastructure/logging/logger.js';
 import type { db } from '@infrastructure/mongo/db.js';
+import { ParsedFeesCollectedEventMapper } from '@infrastructure/mongo/mappers/parsed-fees-collected-event.mapper.js';
+import { FeesCollectedLastBlockModel } from '@infrastructure/mongo/models/fees-collected-last-block.model.js';
 import { ParsedFeesCollectedEventModel } from '@infrastructure/mongo/models/parsed-fees-collected-event.model.js';
 
 export class MongoEventsRepository implements EventsRepository {
@@ -11,15 +13,40 @@ export class MongoEventsRepository implements EventsRepository {
     events: ParsedFeesCollectedEvent[],
   ): Promise<void> {
     logger.info(`Storing ${events.length} feesCollected events`);
-    await ParsedFeesCollectedEventModel.insertMany(events);
-    logger.info(`Stored feesCollected events: ${JSON.stringify(events)}`);
+    const mappedEvents = events.map((e) =>
+      ParsedFeesCollectedEventMapper.toPersistence(e),
+    );
+    await ParsedFeesCollectedEventModel.insertMany(mappedEvents);
+    logger.info(`Stored feesCollected events: ${JSON.stringify(mappedEvents)}`);
+  }
+
+  async setFeesCollectedLastBlock(blockNumber: number): Promise<void> {
+    await FeesCollectedLastBlockModel.updateOne(
+      {},
+      { lastBlock: blockNumber },
+      { upsert: true },
+    );
+    logger.debug(`Last block for feesCollected event set to ${blockNumber}`);
+  }
+
+  async getFeesCollectedLastBlock(): Promise<number | null> {
+    const lastBlockDoc = await FeesCollectedLastBlockModel.findOne({});
+    const lastBlock = lastBlockDoc?.lastBlock || null;
+    logger.debug(`Last block for feesCollected event retrieved: ${lastBlock}`);
+    return lastBlock;
   }
 
   async findFeesCollectedEventsByIntegrator(
     integrator: ParsedFeesCollectedEvent['integrator'],
   ): Promise<ParsedFeesCollectedEvent[]> {
     logger.info(`Finding feesCollected events for integrator: ${integrator}`);
-    // TODO: Implementation for finding events by integrator in MongoDB
+    // TODO: Implementation for finding events by integrator in MongoDB like:
+    // const events = await ParsedFeesCollectedEventModel.find({
+    //   integrator,
+    // });
+    // return events.map((e) =>
+    //   ParsedFeesCollectedEventMapper.toDomain(e),
+    // );
     return [];
   }
 }
