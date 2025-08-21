@@ -2,7 +2,7 @@ import { initApp } from '@app.js';
 import { logger } from '@infrastructure/logging/logger.js';
 import 'dotenv/config';
 
-const app = initApp();
+const app = await initApp();
 const port = process.env.PORT ?? 3000;
 
 app.listen(port, () => {

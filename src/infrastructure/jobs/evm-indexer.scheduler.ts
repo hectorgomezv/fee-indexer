@@ -20,27 +20,21 @@ export class EVMScheduler {
 
   async start(): Promise<void> {
     await this._indexJob();
-    setInterval(() => this._indexJob(), this.intervalMs);
+    setInterval(async () => {
+      await this._indexJob();
+    }, this.intervalMs);
   }
 
   private async _indexJob() {
-    try {
-      const [lastBlockNumber, lastIndexedBlockNumber] = await Promise.all([
-        this.indexerService.getLastBlockNumber(),
-        this.indexerService.getLastIndexedBlockNumber(),
-      ]);
-      const fromBlock = lastIndexedBlockNumber ?? this.latestBlock;
-      const toBlock = Math.min(fromBlock + this.blockDelta, lastBlockNumber);
+    const [lastBlockNumber, lastIndexedBlockNumber] = await Promise.all([
+      this.indexerService.getLastBlockNumber(),
+      this.indexerService.getLastIndexedBlockNumber(),
+    ]);
+    const fromBlock = lastIndexedBlockNumber ?? this.latestBlock;
+    const toBlock = Math.min(fromBlock + this.blockDelta, lastBlockNumber);
 
-      await this.indexerService.indexFeeCollectionEvents(fromBlock, toBlock);
-      this.latestBlock = Math.min(toBlock + 1, lastBlockNumber);
-    } catch (err) {
-      // TODO: retry strategy?
-      logger.error({
-        err,
-        fromBlock: this.latestBlock,
-        toBlock: this.latestBlock + this.blockDelta,
-      });
-    }
+    await this.indexerService.indexFeeCollectionEvents(fromBlock, toBlock);
+    this.latestBlock = Math.min(toBlock + 1, lastBlockNumber);
+    // TODO: catch errors by type and retry job execution depending on the error type.
   }
 }
