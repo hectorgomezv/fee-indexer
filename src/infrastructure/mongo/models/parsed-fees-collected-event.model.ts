@@ -1,10 +1,10 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
 class ParsedFeesCollectedEventSchema {
-  @prop() public token!: string;
-  @prop() public integrator!: string;
-  @prop() public integratorFee!: string;
-  @prop() public lifiFee!: string;
+  @prop({ type: () => String }) public token!: string;
+  @prop({ type: () => String }) public integrator!: string;
+  @prop({ type: () => String }) public integratorFee!: string;
+  @prop({ type: () => String }) public lifiFee!: string;
 }
 
 export const ParsedFeesCollectedEventModel = getModelForClass(

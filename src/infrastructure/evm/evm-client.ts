@@ -9,6 +9,8 @@ export class EVMClient implements EVMClientInterface {
   private provider: providers.JsonRpcProvider;
   private contractAddress: string;
 
+  // TODO: handle provider errors (429 etc.)
+
   constructor(chainConfig: ChainConfig) {
     this.provider = new providers.JsonRpcProvider(chainConfig.rpcUrl);
     this.contractAddress = chainConfig.contractAddress;
