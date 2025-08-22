@@ -1,16 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MongoEventsRepository } from './mongo-events.repository';
 import { ParsedFeesCollectedEventMapper } from './mappers/parsed-fees-collected-event.mapper';
-import { ParsedFeesCollectedEventModel } from './models/parsed-fees-collected-event.model';
-import { FeesCollectedLastBlockModel } from './models/fees-collected-last-block.model';
 import { randomBytes } from 'crypto';
 
-describe('MongoEventsRepository', () => {
-  let repository: MongoEventsRepository;
+let feesCollectedEventsModelMock: any;
+let feesCollectedLastBlockModelMock: any;
+let repository: MongoEventsRepository;
 
+describe('MongoEventsRepository', () => {
   beforeEach(() => {
-    repository = new MongoEventsRepository();
     vi.restoreAllMocks();
+    feesCollectedEventsModelMock = { insertMany: vi.fn() };
+    feesCollectedLastBlockModelMock = {
+      updateOne: vi.fn(),
+      findOne: vi.fn(),
+    };
+    repository = new MongoEventsRepository(
+      feesCollectedLastBlockModelMock,
+      feesCollectedEventsModelMock,
+    );
   });
 
   describe('storeFeesCollectedEvents', () => {
@@ -19,21 +27,17 @@ describe('MongoEventsRepository', () => {
       const mappedEvents = events.map((event) =>
         ParsedFeesCollectedEventMapper.toPersistence(event),
       );
-      const insertManySpy = vi
-        .spyOn(ParsedFeesCollectedEventModel, 'insertMany')
-        .mockResolvedValue(undefined as any);
-
       await repository.storeFeesCollectedEvents(events);
-
-      expect(insertManySpy).toHaveBeenCalledWith(mappedEvents);
+      expect(feesCollectedEventsModelMock.insertMany).toHaveBeenCalledWith(
+        mappedEvents,
+      );
     });
 
     it('should propagate errors', async () => {
       const events = getRandomEvents(2);
-      vi.spyOn(ParsedFeesCollectedEventModel, 'insertMany').mockRejectedValue(
+      feesCollectedEventsModelMock.insertMany.mockRejectedValue(
         new Error('Error message'),
       );
-
       await expect(repository.storeFeesCollectedEvents(events)).rejects.toThrow(
         'Error message',
       );
@@ -42,14 +46,9 @@ describe('MongoEventsRepository', () => {
 
   describe('setFeesCollectedLastBlock', () => {
     it('should upsert the last block into the database', async () => {
-      const blockNumber = 123;
-      const updateOneSpy = vi
-        .spyOn(FeesCollectedLastBlockModel, 'updateOne')
-        .mockResolvedValue(undefined as any);
-
+      const blockNumber = randomInt();
       await repository.setFeesCollectedLastBlock(blockNumber);
-
-      expect(updateOneSpy).toHaveBeenCalledWith(
+      expect(feesCollectedLastBlockModelMock.updateOne).toHaveBeenCalledWith(
         {},
         { lastBlock: blockNumber },
         { upsert: true },
@@ -57,40 +56,35 @@ describe('MongoEventsRepository', () => {
     });
 
     it('should propagate errors', async () => {
-      vi.spyOn(FeesCollectedLastBlockModel, 'updateOne').mockRejectedValue(
+      feesCollectedLastBlockModelMock.updateOne.mockRejectedValue(
         new Error('Error message'),
       );
-
-      await expect(repository.setFeesCollectedLastBlock(123)).rejects.toThrow(
-        'Error message',
-      );
+      await expect(
+        repository.setFeesCollectedLastBlock(randomInt()),
+      ).rejects.toThrow('Error message');
     });
   });
 
   describe('getFeesCollectedLastBlock', () => {
     it('should get the last block from the database', async () => {
-      vi.spyOn(FeesCollectedLastBlockModel, 'findOne').mockResolvedValue({
-        lastBlock: 123,
+      const blockNumber = randomInt();
+      feesCollectedLastBlockModelMock.findOne.mockResolvedValue({
+        lastBlock: blockNumber,
       });
-
       const result = await repository.getFeesCollectedLastBlock();
-
-      expect(result).toEqual(123);
+      expect(result).toEqual(blockNumber);
     });
 
     it('should return null if no last block is found', async () => {
-      vi.spyOn(FeesCollectedLastBlockModel, 'findOne').mockResolvedValue(null);
-
+      feesCollectedLastBlockModelMock.findOne.mockResolvedValue(null);
       const result = await repository.getFeesCollectedLastBlock();
-
       expect(result).toEqual(null);
     });
 
     it('should propagate errors', async () => {
-      vi.spyOn(FeesCollectedLastBlockModel, 'findOne').mockRejectedValue(
+      feesCollectedLastBlockModelMock.findOne.mockRejectedValue(
         new Error('Error message'),
       );
-
       await expect(repository.getFeesCollectedLastBlock()).rejects.toThrow(
         'Error message',
       );

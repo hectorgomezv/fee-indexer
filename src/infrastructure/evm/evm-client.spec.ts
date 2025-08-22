@@ -20,6 +20,8 @@ vi.mock('ethers', () => {
 
 describe('EVMClient', () => {
   const chainConfig: ChainConfig = {
+    chainId: '1',
+    chainName: 'Ethereum',
     rpcUrl: 'https://example.com',
     contractAddress: randomAddress(),
     blockDelta: randomInt(),

@@ -1,4 +1,6 @@
 export interface ChainConfig {
+  chainId: string;
+  chainName: string;
   rpcUrl: string;
   contractAddress: string;
   blockDelta: number;
