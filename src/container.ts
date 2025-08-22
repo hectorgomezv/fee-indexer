@@ -30,9 +30,7 @@ const chainConfigs: ChainConfig[] = [
 
 export async function bootstrap() {
   db.initializeDatabase({ uri: process.env.MONGO_URI! });
-  for (const config of chainConfigs) {
-    _bootstrapChain(config);
-  }
+  await Promise.all(chainConfigs.map((config) => _bootstrapChain(config)));
 }
 
 async function _bootstrapChain(chainConfig: ChainConfig) {

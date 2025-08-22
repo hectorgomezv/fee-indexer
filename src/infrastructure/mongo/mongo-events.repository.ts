@@ -9,10 +9,7 @@ export class MongoEventsRepository implements EventsRepository {
   constructor(
     private feesCollectedLastBlockModel: FeesCollectedLastBlockModel,
     private feesCollectedEventModel: FeesCollectedEventModel,
-  ) {
-    this.feesCollectedLastBlockModel = feesCollectedLastBlockModel;
-    this.feesCollectedEventModel = feesCollectedEventModel;
-  }
+  ) {}
 
   async storeFeesCollectedEvents(
     events: ParsedFeesCollectedEvent[],
