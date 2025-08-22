@@ -6,5 +6,5 @@ const app = await initApp();
 const port = process.env.PORT ?? 3000;
 
 app.listen(port, () => {
-  logger.info(`Server is running on port ${port}`);
+  logger.info(`[HTTP Server] Listening at http://localhost:${port}`);
 });

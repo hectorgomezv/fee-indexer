@@ -18,7 +18,7 @@ export class db {
   private async connect(uri: string): Promise<void> {
     try {
       await mongoose.connect(uri);
-      logger.info(`MongoDB ready at ${uri}`);
+      logger.info('[Database] Successfully connected to MongoDB.');
     } catch (error) {
       logger.error(`MongoDB connection error: ${error}`);
       throw error; // This is a critical error, it should kill the process

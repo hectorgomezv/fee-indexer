@@ -42,7 +42,11 @@ async function _bootstrapChain(chainConfig: ChainConfig) {
     feesCollectedEventModel,
   );
   const evmClient = new EVMClient(chainConfig);
-  const evmIndexer = new EVMIndexerService(evmClient, mongoEventsRepository);
+  const evmIndexer = new EVMIndexerService(
+    chainConfig,
+    evmClient,
+    mongoEventsRepository,
+  );
   const evmScheduler = new EVMScheduler(evmIndexer, chainConfig);
   await evmScheduler.start();
 }

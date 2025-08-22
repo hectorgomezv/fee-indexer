@@ -18,7 +18,6 @@ export class MongoEventsRepository implements EventsRepository {
     await this.feesCollectedEventModel.insertMany(
       events.map((e) => ParsedFeesCollectedEventMapper.toPersistence(e)),
     );
-    logger.info(`Stored ${events.length} feesCollected events`);
   }
 
   async setFeesCollectedLastBlock(blockNumber: number): Promise<void> {
