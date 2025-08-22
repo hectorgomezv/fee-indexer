@@ -1,6 +1,6 @@
-import { BigNumber } from 'ethers';
+import { type BigNumber } from 'ethers';
 
-export interface ParsedFeeCollectorEvent {
+export interface ParsedFeesCollectedEvent {
   token: string;
   integrator: string;
   integratorFee: BigNumber;

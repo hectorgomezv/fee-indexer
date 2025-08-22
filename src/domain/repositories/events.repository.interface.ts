@@ -1,8 +1,15 @@
-import type { ParsedFeeCollectorEvent } from '@domain/entities/parsed-fee-collector-event.entity.js';
+import type { ParsedFeesCollectedEvent } from '@domain/entities/parsed-fees-collected-event.entity.js';
+
+// TODO: add TSDocs
 
 export interface EventsRepository {
-  storeFeeCollectorEvent(event: ParsedFeeCollectorEvent): Promise<void>;
-  findFeeCollectorEventByIntegrator(
-    integrator: ParsedFeeCollectorEvent['integrator'],
-  ): Promise<ParsedFeeCollectorEvent[]>;
+  storeFeesCollectedEvents(events: ParsedFeesCollectedEvent[]): Promise<void>;
+
+  setFeesCollectedLastBlock(blockNumber: number): Promise<void>;
+
+  getFeesCollectedLastBlock(): Promise<number | null>;
+
+  findFeesCollectedEventsByIntegrator(
+    integrator: ParsedFeesCollectedEvent['integrator'],
+  ): Promise<ParsedFeesCollectedEvent[]>;
 }
