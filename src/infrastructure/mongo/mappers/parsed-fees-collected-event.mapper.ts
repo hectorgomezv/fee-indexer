@@ -1,5 +1,5 @@
 import type { ParsedFeesCollectedEvent } from '@domain/entities/parsed-fees-collected-event.entity.js';
-import { ParsedFeesCollectedEventModel } from '@infrastructure/mongo/models/parsed-fees-collected-event.model.js';
+import { ParsedFeesCollectedEvent as ParsedFeesCollectedEventModel } from '@infrastructure/mongo/models/parsed-fees-collected-event.model.js';
 import { BigNumber } from 'ethers';
 
 export class ParsedFeesCollectedEventMapper {
