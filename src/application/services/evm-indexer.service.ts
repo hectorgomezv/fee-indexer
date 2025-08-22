@@ -1,18 +1,25 @@
+import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 import type { EventsRepository } from '@domain/repositories/events.repository.interface.js';
 import type { EVMClient } from '@domain/repositories/evm-client.interface.js';
 import { logger } from '@infrastructure/logging/logger.js';
 
 export class EVMIndexerService {
   constructor(
+    private chainConfig: ChainConfig,
     private evmClient: EVMClient,
     private eventsRepository: EventsRepository,
   ) {}
+
+  // TODO: add tests
 
   async indexFeeCollectionEvents(
     fromBlock: number,
     toBlock: number,
   ): Promise<void> {
-    logger.info(`Indexing from block ${fromBlock} to block ${toBlock}`);
+    const { chainName } = this.chainConfig;
+    logger.info(
+      `[${chainName}] Indexing block ${fromBlock} to block ${toBlock}`,
+    );
     const events = await this.evmClient.fetchFeesCollectedEvents(
       fromBlock,
       toBlock,
@@ -23,6 +30,7 @@ export class EVMIndexerService {
     // event and doing an upsert operation, but the performance trade-off should be considered.
     await this.eventsRepository.storeFeesCollectedEvents(events);
     await this.eventsRepository.setFeesCollectedLastBlock(toBlock);
+    logger.info(`[${chainName}] ${events.length} event(s) indexed`);
   }
 
   async getLastBlockNumber(): Promise<number> {
