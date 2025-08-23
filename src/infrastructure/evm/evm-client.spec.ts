@@ -1,7 +1,7 @@
+import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
+import { EVMClient } from '@infrastructure/evm/evm-client.js';
+import { randomAddress, randomInt } from '@tests/fixtures.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EVMClient } from './evm-client';
-import { type ChainConfig } from '../../domain/entities/chain-config.entity.js';
-import { randomBytes } from 'crypto';
 
 let contractMock: any;
 let providerMock: any;
@@ -89,12 +89,12 @@ describe('EVMClient', () => {
     });
   });
 
-  describe('getLastBlockNumber', () => {
+  describe('getLastBlockInChain', () => {
     it('should return block number', async () => {
       const blockNumber = randomInt();
       providerMock.getBlock.mockResolvedValue({ number: blockNumber });
 
-      const result = await client.getLastBlockNumber();
+      const result = await client.getLastBlockInChain();
 
       expect(result).toBe(blockNumber);
       expect(providerMock.getBlock).toHaveBeenCalledWith('latest');
@@ -102,13 +102,9 @@ describe('EVMClient', () => {
 
     it('should throw if block is null', async () => {
       providerMock.getBlock.mockResolvedValue(null);
-      await expect(client.getLastBlockNumber()).rejects.toThrow(
+      await expect(client.getLastBlockInChain()).rejects.toThrow(
         'Failed to fetch the latest block number',
       );
     });
   });
 });
-
-// Utility functions for test data generation
-const randomAddress = () => `0x${randomBytes(20).toString('hex')}`;
-const randomInt = () => Math.floor(Math.random() * 1000);

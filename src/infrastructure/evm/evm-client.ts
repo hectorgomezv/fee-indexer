@@ -38,7 +38,7 @@ export class EVMClient implements EVMClientInterface {
     });
   }
 
-  async getLastBlockNumber(): Promise<number> {
+  async getLastBlockInChain(): Promise<number> {
     const block = await this.provider.getBlock('latest');
     if (!block) {
       throw new Error('Failed to fetch the latest block number');

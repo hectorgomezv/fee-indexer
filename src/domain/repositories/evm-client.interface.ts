@@ -8,5 +8,5 @@ export interface EVMClient {
     toBlock: BlockTag,
   ): Promise<ParsedFeesCollectedEvent[]>;
 
-  getLastBlockNumber(): Promise<number>;
+  getLastBlockInChain(): Promise<number>;
 }
