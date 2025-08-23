@@ -10,16 +10,12 @@ export class EVMIndexerService {
     private eventsRepository: EventsRepository,
   ) {}
 
-  // TODO: add tests
-
   async indexFeeCollectionEvents(
     fromBlock: number,
     toBlock: number,
   ): Promise<void> {
     const { chainName } = this.chainConfig;
-    logger.info(
-      `[${chainName}] Indexing block ${fromBlock} to block ${toBlock}`,
-    );
+    logger.info(`[${chainName}] Indexing block range ${fromBlock}-${toBlock}`);
     const events = await this.evmClient.fetchFeesCollectedEvents(
       fromBlock,
       toBlock,

@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EVMClient } from './evm-client';
-import { type ChainConfig } from '../../domain/entities/chain-config.entity.js';
+import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
+import { EVMClient } from '@infrastructure/evm/evm-client.js';
 import { randomBytes } from 'crypto';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let contractMock: any;
 let providerMock: any;

@@ -8,3 +8,6 @@ coverage/
 # Environment files
 .env
 .env.docker
+
+# macOS
+.DS_Store

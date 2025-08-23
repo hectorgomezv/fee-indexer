@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MongoEventsRepository } from './mongo-events.repository';
-import { ParsedFeesCollectedEventMapper } from './mappers/parsed-fees-collected-event.mapper';
+import { ParsedFeesCollectedEventMapper } from '@infrastructure/mongo/mappers/parsed-fees-collected-event.mapper.js';
+import { MongoEventsRepository } from '@infrastructure/mongo/mongo-events.repository.js';
 import { randomBytes } from 'crypto';
+import { BigNumber } from 'ethers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let feesCollectedEventsModelMock: any;
 let feesCollectedLastBlockModelMock: any;
@@ -98,8 +99,8 @@ const randomInt = () => Math.floor(Math.random() * 1000);
 const randomEvent = () => ({
   token: randomAddress(),
   integrator: randomAddress(),
-  integratorFee: randomInt(),
-  lifiFee: randomInt(),
+  integratorFee: BigNumber.from(randomInt()),
+  lifiFee: BigNumber.from(randomInt()),
 });
 const getRandomEvents = (maxEvents: number) =>
   Array.from({
