@@ -15,6 +15,11 @@ vi.mock('ethers', () => {
     providers: {
       JsonRpcProvider: vi.fn(() => providerMock),
     },
+    errors: {
+      NETWORK_ERROR: 'NETWORK_ERROR',
+      SERVER_ERROR: 'SERVER_ERROR',
+      TIMEOUT: 'TIMEOUT',
+    },
   };
 });
 

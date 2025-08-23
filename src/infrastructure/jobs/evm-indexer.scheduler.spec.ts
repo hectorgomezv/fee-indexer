@@ -1,4 +1,5 @@
 import type { EVMIndexerService } from '@application/services/evm-indexer.service.js';
+import { ClientError } from '@infrastructure/evm/errors/client.error.js';
 import { EVMScheduler } from '@infrastructure/jobs/evm-indexer.scheduler.js';
 import { buildChainConfig } from '@tests/fixtures.js';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
@@ -78,5 +79,19 @@ describe('EVMScheduler', () => {
       996,
       1_000, // upper limit is capped to last block in chain
     );
+  });
+
+  it('should log an error and return the previous nextBlock if a ClientError occurs', async () => {
+    indexerService.getLastBlockInChain.mockRejectedValue(
+      new ClientError(429, 'NETWORK_ERROR', 'Rate limit exceeded'),
+    );
+    indexerService.getLastIndexedBlockNumber.mockResolvedValue(995);
+    scheduler = new EVMScheduler(indexerService, {
+      ...buildChainConfig(),
+      blockDelta: 10,
+      initialBlockNumber: 200,
+    });
+    const nextBlock = await scheduler.indexJob();
+    expect(nextBlock).toBe(200); // next block stays at previous nextBlock
   });
 });
