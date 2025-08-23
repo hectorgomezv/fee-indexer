@@ -1,37 +1,30 @@
 import { EVMIndexerService } from '@application/services/evm-indexer.service.js';
-import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
-import { randomBytes } from 'crypto';
-import { BigNumber } from 'ethers';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { EventsRepository } from '@domain/repositories/events.repository.interface.js';
+import type { EVMClient } from '@infrastructure/evm/evm-client.js';
+import {
+  buildChainConfig,
+  getRandomEvents,
+  randomInt,
+} from '@tests/fixtures.js';
+import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 
-// TODO: builder?
-let chainConfig: ChainConfig;
-let evmClientMock: any;
-let eventsRepositoryMock: any;
-let evmIndexer: any;
+let evmClientMock: Mocked<EVMClient>;
+let eventsRepositoryMock: Mocked<EventsRepository>;
+let evmIndexer: EVMIndexerService;
 
 describe('EVMIndexerService', () => {
   beforeEach(() => {
-    chainConfig = {
-      chainId: randomInt().toString(),
-      chainName: 'testChain',
-      rpcUrl: 'https://example.com',
-      contractAddress: randomAddress(),
-      blockDelta: randomInt(),
-      initialBlockNumber: randomInt(),
-      intervalMs: randomInt(),
-    };
     evmClientMock = {
       fetchFeesCollectedEvents: vi.fn(),
       getLastBlockInChain: vi.fn(),
-    };
+    } as unknown as Mocked<EVMClient>;
     eventsRepositoryMock = {
       storeFeesCollectedEvents: vi.fn(),
       setFeesCollectedLastBlock: vi.fn(),
       getFeesCollectedLastBlock: vi.fn(),
-    };
+    } as unknown as Mocked<EventsRepository>;
     evmIndexer = new EVMIndexerService(
-      chainConfig,
+      buildChainConfig(),
       evmClientMock,
       eventsRepositoryMock,
     );
@@ -124,17 +117,3 @@ describe('EVMIndexerService', () => {
     });
   });
 });
-
-// Utility functions for test data generation
-const randomAddress = () => `0x${randomBytes(20).toString('hex')}`;
-const randomInt = () => Math.floor(Math.random() * 1000);
-const randomEvent = () => ({
-  token: randomAddress(),
-  integrator: randomAddress(),
-  integratorFee: BigNumber.from(randomInt()),
-  lifiFee: BigNumber.from(randomInt()),
-});
-const getRandomEvents = (maxEvents: number) =>
-  Array.from({
-    length: Math.floor(Math.random() * (maxEvents + 1)),
-  }).map(() => randomEvent());

@@ -1,21 +1,24 @@
 import { ParsedFeesCollectedEventMapper } from '@infrastructure/mongo/mappers/parsed-fees-collected-event.mapper.js';
+import type { FeesCollectedLastBlockModel } from '@infrastructure/mongo/models/fees-collected-last-block.model.js';
+import type { FeesCollectedEventModel } from '@infrastructure/mongo/models/parsed-fees-collected-event.model.js';
 import { MongoEventsRepository } from '@infrastructure/mongo/mongo-events.repository.js';
-import { randomBytes } from 'crypto';
-import { BigNumber } from 'ethers';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getRandomEvents, randomInt } from '@tests/fixtures.js';
+import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 
-let feesCollectedEventsModelMock: any;
-let feesCollectedLastBlockModelMock: any;
+let feesCollectedEventsModelMock: Mocked<FeesCollectedEventModel>;
+let feesCollectedLastBlockModelMock: Mocked<FeesCollectedLastBlockModel>;
 let repository: MongoEventsRepository;
 
 describe('MongoEventsRepository', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    feesCollectedEventsModelMock = { insertMany: vi.fn() };
+    feesCollectedEventsModelMock = {
+      insertMany: vi.fn(),
+    } as unknown as Mocked<FeesCollectedEventModel>;
     feesCollectedLastBlockModelMock = {
       updateOne: vi.fn(),
       findOne: vi.fn(),
-    };
+    } as unknown as Mocked<FeesCollectedLastBlockModel>;
     repository = new MongoEventsRepository(
       feesCollectedLastBlockModelMock,
       feesCollectedEventsModelMock,
@@ -92,17 +95,3 @@ describe('MongoEventsRepository', () => {
     });
   });
 });
-
-// Utility functions for test data generation
-const randomAddress = () => `0x${randomBytes(20).toString('hex')}`;
-const randomInt = () => Math.floor(Math.random() * 1000);
-const randomEvent = () => ({
-  token: randomAddress(),
-  integrator: randomAddress(),
-  integratorFee: BigNumber.from(randomInt()),
-  lifiFee: BigNumber.from(randomInt()),
-});
-const getRandomEvents = (maxEvents: number) =>
-  Array.from({
-    length: Math.floor(Math.random() * (maxEvents + 1)),
-  }).map(() => randomEvent());

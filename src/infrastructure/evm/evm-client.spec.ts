@@ -1,6 +1,6 @@
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 import { EVMClient } from '@infrastructure/evm/evm-client.js';
-import { randomBytes } from 'crypto';
+import { randomAddress, randomInt } from '@tests/fixtures.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let contractMock: any;
@@ -108,7 +108,3 @@ describe('EVMClient', () => {
     });
   });
 });
-
-// Utility functions for test data generation
-const randomAddress = () => `0x${randomBytes(20).toString('hex')}`;
-const randomInt = () => Math.floor(Math.random() * 1000);

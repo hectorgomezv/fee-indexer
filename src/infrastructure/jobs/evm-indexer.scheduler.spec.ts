@@ -1,10 +1,9 @@
-import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
+import type { EVMIndexerService } from '@application/services/evm-indexer.service.js';
 import { EVMScheduler } from '@infrastructure/jobs/evm-indexer.scheduler.js';
-import { randomBytes } from 'crypto';
-import { BigNumber } from 'ethers';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { buildChainConfig } from '@tests/fixtures.js';
+import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 
-let indexerService: any;
+let indexerService: Mocked<EVMIndexerService>;
 let scheduler: EVMScheduler;
 
 describe('EVMScheduler', () => {
@@ -13,26 +12,19 @@ describe('EVMScheduler', () => {
       getLastBlockInChain: vi.fn(),
       getLastIndexedBlockNumber: vi.fn(),
       indexFeeCollectionEvents: vi.fn(),
-    };
+    } as unknown as Mocked<EVMIndexerService>;
     vi.clearAllMocks();
   });
 
   it('should index [initialBlockNumber -> (initialBlockNumber + delta)] if (lastIndexedBlockNumber < initialBlockNumber)', async () => {
     indexerService.getLastBlockInChain.mockResolvedValue(1_000);
     indexerService.getLastIndexedBlockNumber.mockResolvedValue(100);
-    const chainConfig = {
-      chainId: randomInt().toString(),
-      chainName: 'testChain',
-      rpcUrl: 'https://example.com',
-      contractAddress: randomAddress(),
+    scheduler = new EVMScheduler(indexerService, {
+      ...buildChainConfig(),
       blockDelta: 10,
       initialBlockNumber: 200,
-      intervalMs: 1000,
-    };
-    scheduler = new EVMScheduler(indexerService, chainConfig);
-
+    });
     const nextBlock = await scheduler.indexJob();
-
     expect(nextBlock).toBe(210);
     expect(indexerService.indexFeeCollectionEvents).toHaveBeenCalledWith(
       200,
@@ -43,42 +35,28 @@ describe('EVMScheduler', () => {
   it('should index [initialBlockNumber -> (initialBlockNumber + delta)] if lastIndexedBlockNumber does not exist', async () => {
     indexerService.getLastBlockInChain.mockResolvedValue(1_000);
     indexerService.getLastIndexedBlockNumber.mockResolvedValue(null);
-    const chainConfig = {
-      chainId: randomInt().toString(),
-      chainName: 'testChain',
-      rpcUrl: 'https://example.com',
-      contractAddress: randomAddress(),
-      blockDelta: 10,
-      initialBlockNumber: 200,
-      intervalMs: 1000,
-    };
-    scheduler = new EVMScheduler(indexerService, chainConfig);
-
+    scheduler = new EVMScheduler(indexerService, {
+      ...buildChainConfig(),
+      blockDelta: 50,
+      initialBlockNumber: 100,
+    });
     const nextBlock = await scheduler.indexJob();
-
-    expect(nextBlock).toBe(210);
+    expect(nextBlock).toBe(150);
     expect(indexerService.indexFeeCollectionEvents).toHaveBeenCalledWith(
-      200,
-      209,
+      100,
+      149,
     );
   });
 
   it('should index [lastIndexedBlockNumber -> lastIndexedBlockNumber + delta] if (lastIndexedBlockNumber >= initialBlockNumber)', async () => {
     indexerService.getLastBlockInChain.mockResolvedValue(1_000);
     indexerService.getLastIndexedBlockNumber.mockResolvedValue(299);
-    const chainConfig = {
-      chainId: randomInt().toString(),
-      chainName: 'testChain',
-      rpcUrl: 'https://example.com',
-      contractAddress: randomAddress(),
+    scheduler = new EVMScheduler(indexerService, {
+      ...buildChainConfig(),
       blockDelta: 10,
       initialBlockNumber: 200,
-      intervalMs: 1000,
-    };
-    scheduler = new EVMScheduler(indexerService, chainConfig);
-
+    });
     const nextBlock = await scheduler.indexJob();
-
     expect(nextBlock).toBe(310);
     expect(indexerService.indexFeeCollectionEvents).toHaveBeenCalledWith(
       300,
@@ -89,38 +67,16 @@ describe('EVMScheduler', () => {
   it('should index [lastIndexedBlockNumber -> latestBlockInChain] if (lastIndexedBlockNumber + delta >= latestBlockInChain)', async () => {
     indexerService.getLastBlockInChain.mockResolvedValue(1_000);
     indexerService.getLastIndexedBlockNumber.mockResolvedValue(995);
-    const chainConfig = {
-      chainId: randomInt().toString(),
-      chainName: 'testChain',
-      rpcUrl: 'https://example.com',
-      contractAddress: randomAddress(),
+    scheduler = new EVMScheduler(indexerService, {
+      ...buildChainConfig(),
       blockDelta: 10,
       initialBlockNumber: 200,
-      intervalMs: 1000,
-    };
-    scheduler = new EVMScheduler(indexerService, chainConfig);
-
+    });
     const nextBlock = await scheduler.indexJob();
-
     expect(nextBlock).toBe(1_000); // next block is capped to last block in chain
     expect(indexerService.indexFeeCollectionEvents).toHaveBeenCalledWith(
       996,
-      1_000,
+      1_000, // upper limit is capped to last block in chain
     );
   });
 });
-
-// TODO: extract this
-// Utility functions for test data generation
-const randomAddress = () => `0x${randomBytes(20).toString('hex')}`;
-const randomInt = () => Math.floor(Math.random() * 1000);
-const randomEvent = () => ({
-  token: randomAddress(),
-  integrator: randomAddress(),
-  integratorFee: BigNumber.from(randomInt()),
-  lifiFee: BigNumber.from(randomInt()),
-});
-const getRandomEvents = (maxEvents: number) =>
-  Array.from({
-    length: Math.floor(Math.random() * (maxEvents + 1)),
-  }).map(() => randomEvent());

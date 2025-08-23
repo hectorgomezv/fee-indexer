@@ -28,12 +28,12 @@ const chainConfigs: ChainConfig[] = [
   },
 ];
 
-export async function bootstrap() {
+export async function bootstrap(): Promise<void> {
   db.initializeDatabase({ uri: process.env.MONGO_URI! });
   await Promise.all(chainConfigs.map((config) => _bootstrapChain(config)));
 }
 
-async function _bootstrapChain(chainConfig: ChainConfig) {
+async function _bootstrapChain(chainConfig: ChainConfig): Promise<void> {
   const { chainName } = chainConfig;
   const feesCollectedLastBlockModel = getFeesCollectedLastBlockModel(chainName);
   const feesCollectedEventModel = getFeesCollectedEventModel(chainName);
