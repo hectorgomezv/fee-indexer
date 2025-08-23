@@ -1,5 +1,7 @@
 import { type EVMIndexerService } from '@application/services/evm-indexer.service.js';
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
+import { ClientError } from '@infrastructure/evm/errors/client.error.js';
+import { logger } from '@infrastructure/logging/logger.js';
 
 type BlockRange = { startBlock: number; endBlock: number };
 
@@ -19,6 +21,10 @@ export class EVMScheduler {
   async start(): Promise<void> {
     await this.indexJob();
     setInterval(() => this.indexJob(), this.chainConfig.intervalMs);
+    // Improvement note:
+    // In a multi-instance deployment, race conditions could occur (multiple instances
+    // might index the same block range). Using a centralized task queue or distributed
+    // lock would prevent duplicate work and data.
   }
 
   /**
@@ -27,12 +33,25 @@ export class EVMScheduler {
    * Note: This method is public for testing purposes.
    */
   public async indexJob(): Promise<number> {
-    const latestBlockInChain = await this.indexerService.getLastBlockInChain();
-    const { startBlock, endBlock } =
-      await this._getBlockRange(latestBlockInChain);
-    await this.indexerService.indexFeeCollectionEvents(startBlock, endBlock);
-    this.nextBlock = Math.min(endBlock + 1, latestBlockInChain);
-    return this.nextBlock;
+    try {
+      const latestBlockInChain =
+        await this.indexerService.getLastBlockInChain();
+      const { startBlock, endBlock } =
+        await this._getBlockRange(latestBlockInChain);
+      await this.indexerService.indexFeeCollectionEvents(startBlock, endBlock);
+      this.nextBlock = Math.min(endBlock + 1, latestBlockInChain);
+      return this.nextBlock;
+    } catch (err) {
+      if (err instanceof ClientError) {
+        logger.error(
+          `[${this.chainConfig.chainName}] An error occurred while fetching FeesCollected events: ${err.message}`,
+        );
+        return this.nextBlock;
+        // Improvement note:
+        // Interval could be adjusted dynamically (exp. backoff, etc.) on errors.
+      }
+      throw err;
+    }
   }
 
   /**
