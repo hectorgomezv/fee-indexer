@@ -89,12 +89,12 @@ describe('EVMClient', () => {
     });
   });
 
-  describe('getLastBlockNumber', () => {
+  describe('getLastBlockInChain', () => {
     it('should return block number', async () => {
       const blockNumber = randomInt();
       providerMock.getBlock.mockResolvedValue({ number: blockNumber });
 
-      const result = await client.getLastBlockNumber();
+      const result = await client.getLastBlockInChain();
 
       expect(result).toBe(blockNumber);
       expect(providerMock.getBlock).toHaveBeenCalledWith('latest');
@@ -102,7 +102,7 @@ describe('EVMClient', () => {
 
     it('should throw if block is null', async () => {
       providerMock.getBlock.mockResolvedValue(null);
-      await expect(client.getLastBlockNumber()).rejects.toThrow(
+      await expect(client.getLastBlockInChain()).rejects.toThrow(
         'Failed to fetch the latest block number',
       );
     });

@@ -27,7 +27,7 @@ export class EVMScheduler {
    * Note: This method is public for testing purposes.
    */
   public async indexJob(): Promise<number> {
-    const latestBlockInChain = await this.indexerService.getLastBlockNumber();
+    const latestBlockInChain = await this.indexerService.getLastBlockInChain();
     const { startBlock, endBlock } =
       await this._getBlockRange(latestBlockInChain);
     await this.indexerService.indexFeeCollectionEvents(startBlock, endBlock);

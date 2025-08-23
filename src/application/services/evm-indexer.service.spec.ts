@@ -23,7 +23,7 @@ describe('EVMIndexerService', () => {
     };
     evmClientMock = {
       fetchFeesCollectedEvents: vi.fn(),
-      getLastBlockNumber: vi.fn(),
+      getLastBlockInChain: vi.fn(),
     };
     eventsRepositoryMock = {
       storeFeesCollectedEvents: vi.fn(),
@@ -84,20 +84,20 @@ describe('EVMIndexerService', () => {
     });
   });
 
-  describe('getLastBlockNumber', () => {
+  describe('getLastBlockInChain', () => {
     it('should return the last block number', async () => {
       const lastBlockNumber = randomInt();
-      evmClientMock.getLastBlockNumber.mockResolvedValue(lastBlockNumber);
-      const result = await evmIndexer.getLastBlockNumber();
+      evmClientMock.getLastBlockInChain.mockResolvedValue(lastBlockNumber);
+      const result = await evmIndexer.getLastBlockInChain();
       expect(result).toBe(lastBlockNumber);
-      expect(evmClientMock.getLastBlockNumber).toHaveBeenCalled();
+      expect(evmClientMock.getLastBlockInChain).toHaveBeenCalled();
     });
 
-    it('should propagate errors from getLastBlockNumber', async () => {
-      evmClientMock.getLastBlockNumber.mockRejectedValue(
+    it('should propagate errors from getLastBlockInChain', async () => {
+      evmClientMock.getLastBlockInChain.mockRejectedValue(
         new Error('Error message'),
       );
-      await expect(evmIndexer.getLastBlockNumber()).rejects.toThrow(
+      await expect(evmIndexer.getLastBlockInChain()).rejects.toThrow(
         'Error message',
       );
     });

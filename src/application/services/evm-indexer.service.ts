@@ -29,8 +29,8 @@ export class EVMIndexerService {
     logger.info(`[${chainName}] ${events.length} event(s) indexed`);
   }
 
-  async getLastBlockNumber(): Promise<number> {
-    return this.evmClient.getLastBlockNumber();
+  async getLastBlockInChain(): Promise<number> {
+    return this.evmClient.getLastBlockInChain();
   }
 
   async getLastIndexedBlockNumber(): Promise<number | null> {
