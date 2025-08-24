@@ -43,9 +43,14 @@ export class EVMIndexerService {
   async getFeesCollectedByIntegrator(
     integrator: string,
   ): Promise<ParsedFeesCollectedEvent[]> {
-    return this.eventsRepository.findFeesCollectedEventsByIntegrator(
-      integrator,
+    const events =
+      await this.eventsRepository.findFeesCollectedEventsByIntegrator(
+        integrator,
+      );
+    logger.info(
+      `[${this.chainConfig.chainName}] Found ${events.length} events for integrator ${integrator}`,
     );
+    return events;
   }
 
   /**
