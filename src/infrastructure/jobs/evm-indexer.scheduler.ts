@@ -22,9 +22,9 @@ export class EVMScheduler {
     await this.indexJob();
     setInterval(() => this.indexJob(), this.chainConfig.intervalMs);
     // Improvement note:
-    // In a multi-instance deployment, race conditions could occur (multiple instances
-    // might index the same block range). Using a centralized task queue or distributed
-    // lock would prevent duplicate work and data.
+    // When deployed on microservices, race conditions could occur (as multiple
+    // service instances might index the same block range). Using a centralized
+    // task queue or distributed lock would prevent duplicate work and data.
   }
 
   /**
