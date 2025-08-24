@@ -40,13 +40,11 @@ export class MongoEventsRepository implements EventsRepository {
     integrator: ParsedFeesCollectedEvent['integrator'],
   ): Promise<ParsedFeesCollectedEvent[]> {
     logger.info(`Finding feesCollected events for integrator: ${integrator}`);
-    // TODO: Implementation for finding events by integrator in MongoDB like:
-    // const events = await ParsedFeesCollectedEventModel.find({
-    //   integrator,
-    // });
-    // return events.map((e) =>
-    //   ParsedFeesCollectedEventMapper.toDomain(e),
-    // );
-    return [];
+    const events = await this.feesCollectedEventModel.find({
+      integrator,
+    });
+    return events.map((event) =>
+      ParsedFeesCollectedEventMapper.toDomain(event),
+    );
   }
 }

@@ -1,10 +1,12 @@
 import { EVMIndexerService } from '@application/services/evm-indexer.service.js';
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
+import { EVMIndexerController } from '@infrastructure/api/fees-collected/fees-collected.controller.js';
 import { EVMClient } from '@infrastructure/evm/evm-client.js';
 import { EVMScheduler } from '@infrastructure/jobs/evm-indexer.scheduler.js';
 import { getFeesCollectedLastBlockModel } from '@infrastructure/mongo/models/fees-collected-last-block.model.js';
 import { getFeesCollectedEventModel } from '@infrastructure/mongo/models/parsed-fees-collected-event.model.js';
 import { MongoEventsRepository } from '@infrastructure/mongo/mongo-events.repository.js';
+import type { Application } from 'express';
 
 const chainConfigs: ChainConfig[] = [
   {
@@ -27,26 +29,31 @@ const chainConfigs: ChainConfig[] = [
   },
 ];
 
-export async function bootstrapIndexers(): Promise<void> {
+export async function bootstrapIndexers(
+  httpServer: Application,
+): Promise<void> {
   await Promise.all(
-    chainConfigs.map((chainConfig) => _bootstrapChainIndexer(chainConfig)),
+    chainConfigs.map((chainConfig) =>
+      _bootstrapChainIndexer(chainConfig, httpServer),
+    ),
   );
 }
 
-async function _bootstrapChainIndexer(chainConfig: ChainConfig): Promise<void> {
-  const { chainName } = chainConfig;
+async function _bootstrapChainIndexer(
+  chainConfig: ChainConfig,
+  httpServer: Application,
+): Promise<void> {
+  const { chainId, chainName } = chainConfig;
   const feesCollectedLastBlockModel = getFeesCollectedLastBlockModel(chainName);
   const feesCollectedEventModel = getFeesCollectedEventModel(chainName);
-  const mongoEventsRepository = new MongoEventsRepository(
+  const repository = new MongoEventsRepository(
     feesCollectedLastBlockModel,
     feesCollectedEventModel,
   );
-  const evmClient = new EVMClient(chainConfig);
-  const evmIndexer = new EVMIndexerService(
-    chainConfig,
-    evmClient,
-    mongoEventsRepository,
-  );
-  const evmScheduler = new EVMScheduler(evmIndexer, chainConfig);
-  await evmScheduler.start();
+  const client = new EVMClient(chainConfig);
+  const service = new EVMIndexerService(chainConfig, client, repository);
+  const scheduler = new EVMScheduler(service, chainConfig);
+  const httpController = new EVMIndexerController(service);
+  httpServer.use(`/api/${chainId}`, httpController.router);
+  await scheduler.start();
 }
