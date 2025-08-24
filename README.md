@@ -1,6 +1,6 @@
 # Fee Indexer
 
-“A lightweight Node.js/Express service for indexing and exposing LiFi’s FeesCollected events via a REST API.
+A lightweight Node.js/Express service for indexing and exposing LiFi’s FeesCollected events via a REST API.
 
 ## Getting Started
 
