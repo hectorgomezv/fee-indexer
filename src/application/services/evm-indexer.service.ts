@@ -1,4 +1,5 @@
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
+import type { ParsedFeesCollectedEvent } from '@domain/entities/parsed-fees-collected-event.entity.js';
 import type { EventsRepository } from '@domain/repositories/events.repository.interface.js';
 import type { EVMClient } from '@domain/repositories/evm-client.interface.js';
 import { logger } from '@infrastructure/logging/logger.js';
@@ -29,10 +30,36 @@ export class EVMIndexerService {
     logger.info(`[${chainName}] ${events.length} event(s) indexed`);
   }
 
+  // Improvement note:
+  // Consider adding caching for fees collected events by integrator.
+  // Options:
+  // a. Invalidating the integrator's cache entry entirely when new events are indexed.
+  // b. Maintaining a Redis sorted set of events synchronized with the DB.
+  /**
+   * Get fees collected by a specific integrator.
+   * @param integrator The integrator's identifier.
+   * @returns The fees collected by the integrator.
+   */
+  async getFeesCollectedByIntegrator(
+    integrator: string,
+  ): Promise<ParsedFeesCollectedEvent[]> {
+    return this.eventsRepository.findFeesCollectedEventsByIntegrator(
+      integrator,
+    );
+  }
+
+  /**
+   * Get the last block number in the blockchain.
+   * @returns The last block number.
+   */
   async getLastBlockInChain(): Promise<number> {
     return this.evmClient.getLastBlockInChain();
   }
 
+  /**
+   * Get the last indexed block number.
+   * @returns The last indexed block number or null if not found.
+   */
   async getLastIndexedBlockNumber(): Promise<number | null> {
     return this.eventsRepository.getFeesCollectedLastBlock();
   }
