@@ -5,16 +5,18 @@
     "rpcUrl": "https://polygon-rpc.com",
     "contractAddress": "0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9",
     "blockDelta": 50,
-    "initialBlockNumber": 70000000,
-    "intervalMs": 2000
+    "initialBlockNumber": 75632555,
+    "intervalMs": 2000,
+    "blockConfirmationsThreshold": 20
   },
   {
     "chainId": "8453",
     "chainName": "Base",
     "rpcUrl": "https://base.drpc.org",
     "contractAddress": "0x0a6d96e7f4d7b96cfe42185df61e64d255c12dff",
-    "blockDelta": 50,
-    "initialBlockNumber": 30000000,
-    "intervalMs": 500
+    "blockDelta": 10,
+    "initialBlockNumber": 34664144,
+    "intervalMs": 500,
+    "blockConfirmationsThreshold": 2
   }
 ]
