@@ -83,8 +83,10 @@ export class EVMScheduler {
     latestBlockInChain: number,
     lastIndexed: number | null,
   ): Promise<BlockRange> {
-    const lastSafeBlock =
-      latestBlockInChain - this.chainConfig.blockConfirmationsThreshold;
+    const lastSafeBlock = Math.max(
+      0,
+      latestBlockInChain - this.chainConfig.blockConfirmationsThreshold,
+    );
     const startBlock =
       lastIndexed && lastIndexed >= this.chainConfig.initialBlockNumber
         ? lastIndexed + 1
