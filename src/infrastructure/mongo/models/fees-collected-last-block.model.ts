@@ -1,7 +1,7 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
 export class FeesCollectedLastBlock {
-  @prop({ type: () => Number }) public lastBlock!: number;
+  @prop({ type: Number }) public lastBlock!: number;
 }
 
 export const getFeesCollectedLastBlockModel = (chainName: string) => {

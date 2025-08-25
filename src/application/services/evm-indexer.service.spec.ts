@@ -1,6 +1,6 @@
 import { EVMIndexerService } from '@application/services/evm-indexer.service.js';
 import type { EventsRepository } from '@domain/repositories/events.repository.interface.js';
-import type { EVMClient } from '@infrastructure/evm/evm-client.js';
+import type { EthersEVMClient } from '@infrastructure/evm/ethers-evm-client.js';
 import {
   buildChainConfig,
   getRandomEvents,
@@ -8,7 +8,7 @@ import {
 } from '@tests/fixtures.js';
 import { beforeEach, describe, expect, it, vi, type Mocked } from 'vitest';
 
-let evmClientMock: Mocked<EVMClient>;
+let evmClientMock: Mocked<EthersEVMClient>;
 let eventsRepositoryMock: Mocked<EventsRepository>;
 let evmIndexer: EVMIndexerService;
 
@@ -17,7 +17,7 @@ describe('EVMIndexerService', () => {
     evmClientMock = {
       fetchFeesCollectedEvents: vi.fn(),
       getLastBlockInChain: vi.fn(),
-    } as unknown as Mocked<EVMClient>;
+    } as unknown as Mocked<EthersEVMClient>;
     eventsRepositoryMock = {
       storeFeesCollectedEvents: vi.fn(),
       setFeesCollectedLastBlock: vi.fn(),

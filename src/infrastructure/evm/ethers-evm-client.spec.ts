@@ -1,5 +1,5 @@
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
-import { EVMClient } from '@infrastructure/evm/evm-client.js';
+import { EthersEVMClient } from '@infrastructure/evm/ethers-evm-client.js';
 import { randomAddress, randomInt } from '@tests/fixtures.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,7 +34,7 @@ describe('EVMClient', () => {
     intervalMs: randomInt(),
   };
 
-  let client: EVMClient;
+  let client: EthersEVMClient;
 
   beforeEach(() => {
     contractMock = {
@@ -43,7 +43,7 @@ describe('EVMClient', () => {
       interface: { parseLog: vi.fn() },
     };
     providerMock = { getBlock: vi.fn() };
-    client = new EVMClient(chainConfig);
+    client = new EthersEVMClient(chainConfig);
   });
 
   describe('fetchFeesCollectedEvents', () => {

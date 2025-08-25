@@ -18,7 +18,7 @@ export class HttpServer {
     this.app.use(pinoHttp());
   }
 
-  start() {
+  start(): void {
     this.app.use(this._errorHandler);
     this.app.listen(this.port, () => {
       logger.info(`[HTTP Server] Listening at http://localhost:${this.port}`);

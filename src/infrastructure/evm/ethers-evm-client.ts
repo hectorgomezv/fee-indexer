@@ -1,6 +1,6 @@
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 import type { ParsedFeesCollectedEvent } from '@domain/entities/parsed-fees-collected-event.entity.js';
-import type { EVMClient as EVMClientInterface } from '@domain/repositories/evm-client.interface.js';
+import type { EVMClient } from '@domain/repositories/evm-client.interface.js';
 import { type BlockTag } from '@ethersproject/abstract-provider';
 import { ClientError } from '@infrastructure/evm/errors/client.error.js';
 import { BigNumber, Contract, errors, providers } from 'ethers';
@@ -12,7 +12,7 @@ interface ProviderError {
   message?: string;
 }
 
-export class EVMClient implements EVMClientInterface {
+export class EthersEVMClient implements EVMClient {
   private provider: providers.JsonRpcProvider;
   private contractAddress: string;
 
