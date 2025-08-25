@@ -15,7 +15,7 @@
     "rpcUrl": "https://base.drpc.org",
     "contractAddress": "0x0a6d96e7f4d7b96cfe42185df61e64d255c12dff",
     "blockDelta": 50,
-    "initialBlockNumber": 34600000,
+    "initialBlockNumber": 34664000,
     "intervalMs": 1000,
     "blockConfirmationsThreshold": 2
   }
