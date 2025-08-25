@@ -7,7 +7,7 @@ import 'dotenv/config';
 import chainConfigs from './infrastructure/config/chains-config.json' with { type: 'json' };
 
 async function main() {
-  Database.initializeDatabase({ uri: process.env.MONGO_URI! });
+  await Database.initializeDatabase({ uri: process.env.MONGO_URI! });
   const httpServer = new HttpServer();
   const instances = chainConfigs.map(
     // httpServer.app is passed to each ChainInstance to add its routes
