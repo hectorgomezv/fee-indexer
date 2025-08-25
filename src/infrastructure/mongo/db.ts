@@ -2,16 +2,14 @@ import { logger } from '@infrastructure/logging/logger.js';
 import type { DBConfig } from '@infrastructure/mongo/db.config.entity.js';
 import mongoose from 'mongoose';
 
-export class db {
-  private static instance: db;
+export class Database {
+  private static instance: Database;
 
-  private constructor(dbConfig: DBConfig) {
-    this.connect(dbConfig.uri);
-  }
-
-  public static initializeDatabase(dbConfig: DBConfig): void {
-    if (!db.instance) {
-      db.instance = new db(dbConfig);
+  public static async initializeDatabase(dbConfig: DBConfig): Promise<void> {
+    if (!Database.instance) {
+      const db = new Database();
+      await db.connect(dbConfig.uri);
+      Database.instance = db;
     }
   }
 
