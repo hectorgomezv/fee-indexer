@@ -1,6 +1,6 @@
 import type { ChainConfig } from '@domain/entities/chain-config.entity.js';
 import { EthersEVMClient } from '@infrastructure/evm/ethers-evm-client.js';
-import { randomAddress, randomInt } from '@tests/fixtures.js';
+import { buildChainConfig, randomAddress, randomInt } from '@tests/fixtures.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 let contractMock: any;
@@ -24,16 +24,6 @@ vi.mock('ethers', () => {
 });
 
 describe('EVMClient', () => {
-  const chainConfig: ChainConfig = {
-    chainId: '1',
-    chainName: 'Ethereum',
-    rpcUrl: 'https://example.com',
-    contractAddress: randomAddress(),
-    blockDelta: randomInt(),
-    initialBlockNumber: randomInt(),
-    intervalMs: randomInt(),
-  };
-
   let client: EthersEVMClient;
 
   beforeEach(() => {
@@ -43,7 +33,7 @@ describe('EVMClient', () => {
       interface: { parseLog: vi.fn() },
     };
     providerMock = { getBlock: vi.fn() };
-    client = new EthersEVMClient(chainConfig);
+    client = new EthersEVMClient(buildChainConfig());
   });
 
   describe('fetchFeesCollectedEvents', () => {

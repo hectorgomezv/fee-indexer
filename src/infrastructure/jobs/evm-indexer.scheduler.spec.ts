@@ -24,6 +24,7 @@ describe('EVMScheduler', () => {
       ...buildChainConfig(),
       blockDelta: 10,
       initialBlockNumber: 200,
+      blockConfirmationsThreshold: 1,
     });
     const nextBlock = await scheduler.indexJob();
     expect(nextBlock).toBe(210);
@@ -40,6 +41,7 @@ describe('EVMScheduler', () => {
       ...buildChainConfig(),
       blockDelta: 50,
       initialBlockNumber: 100,
+      blockConfirmationsThreshold: 1,
     });
     const nextBlock = await scheduler.indexJob();
     expect(nextBlock).toBe(150);
@@ -56,6 +58,7 @@ describe('EVMScheduler', () => {
       ...buildChainConfig(),
       blockDelta: 10,
       initialBlockNumber: 200,
+      blockConfirmationsThreshold: 1,
     });
     const nextBlock = await scheduler.indexJob();
     expect(nextBlock).toBe(310);
@@ -65,20 +68,18 @@ describe('EVMScheduler', () => {
     );
   });
 
-  it('should index [lastIndexedBlockNumber -> latestBlockInChain] if (lastIndexedBlockNumber + delta >= latestBlockInChain)', async () => {
+  it('should not index if no new blocks are available (endBlock < startBlock)', async () => {
     indexerService.getLastBlockInChain.mockResolvedValue(1_000);
-    indexerService.getLastIndexedBlockNumber.mockResolvedValue(995);
+    indexerService.getLastIndexedBlockNumber.mockResolvedValue(991);
     scheduler = new EVMScheduler(indexerService, {
       ...buildChainConfig(),
       blockDelta: 10,
       initialBlockNumber: 200,
+      blockConfirmationsThreshold: 10,
     });
     const nextBlock = await scheduler.indexJob();
-    expect(nextBlock).toBe(1_000); // next block is capped to last block in chain
-    expect(indexerService.indexFeeCollectionEvents).toHaveBeenCalledWith(
-      996,
-      1_000, // upper limit is capped to last block in chain
-    );
+    expect(indexerService.indexFeeCollectionEvents).not.toBeCalled();
+    expect(nextBlock).toBe(200); // next block stays at previous nextBlock
   });
 
   it('should log an error and return the previous nextBlock if a ClientError occurs', async () => {
@@ -90,8 +91,10 @@ describe('EVMScheduler', () => {
       ...buildChainConfig(),
       blockDelta: 10,
       initialBlockNumber: 200,
+      blockConfirmationsThreshold: 1,
     });
     const nextBlock = await scheduler.indexJob();
+    expect(indexerService.indexFeeCollectionEvents).not.toBeCalled();
     expect(nextBlock).toBe(200); // next block stays at previous nextBlock
   });
 });

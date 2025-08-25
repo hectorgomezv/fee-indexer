@@ -34,4 +34,5 @@ export const buildChainConfig = (): ChainConfig => ({
   blockDelta: randomInt(),
   initialBlockNumber: randomInt(),
   intervalMs: randomInt(),
+  blockConfirmationsThreshold: randomInt(),
 });

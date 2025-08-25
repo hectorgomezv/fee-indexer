@@ -7,7 +7,6 @@ type BlockRange = { startBlock: number; endBlock: number };
 
 export class EVMScheduler {
   private nextBlock: number;
-
   constructor(
     private indexerService: EVMIndexerService,
     private chainConfig: ChainConfig,
@@ -36,8 +35,17 @@ export class EVMScheduler {
     try {
       const latestBlockInChain =
         await this.indexerService.getLastBlockInChain();
-      const { startBlock, endBlock } =
-        await this._getBlockRange(latestBlockInChain);
+      const lastIndexed = await this.indexerService.getLastIndexedBlockNumber();
+      const { startBlock, endBlock } = await this._getBlockRange(
+        latestBlockInChain,
+        lastIndexed,
+      );
+      if (startBlock > endBlock) {
+        logger.info(
+          `[${this.chainConfig.chainName}] No new confirmed blocks to index.`,
+        );
+        return this.nextBlock;
+      }
       await this.indexerService.indexFeeCollectionEvents(startBlock, endBlock);
       this.nextBlock = Math.min(endBlock + 1, latestBlockInChain);
       return this.nextBlock;
@@ -62,23 +70,30 @@ export class EVMScheduler {
    *   if the {@link ChainConfig.initialBlockNumber} is greater than the last indexed block.
    * - otherwise, the block immediately after the last indexed block.
    *
-   * The range ends at `startBlock + {@link ChainConfig.blockDelta}`, unless that would exceed the
-   * {@link latestBlockInChain}, in which case it is capped at {@link latestBlockInChain}.
+   * The range ends at `startBlock + {@link ChainConfig.blockDelta}`, capped at the
+   * ({@link latestBlockInChain} - {@link ChainConfig.blockConfirmationsThreshold}),
+   * to ensure that only blocks with enough confirmations are indexed and avoid
+   * issues with potential chain reorganizations.
    *
    * @param latestBlockInChain The latest block number currently available in the chain.
+   * @param lastIndexed The last indexed block number.
    * @returns An inclusive {@link BlockRange} to be indexed.
    */
   private async _getBlockRange(
     latestBlockInChain: number,
+    lastIndexed: number | null,
   ): Promise<BlockRange> {
-    const lastIndexed = await this.indexerService.getLastIndexedBlockNumber();
+    const lastSafeBlock = Math.max(
+      0,
+      latestBlockInChain - this.chainConfig.blockConfirmationsThreshold,
+    );
     const startBlock =
       lastIndexed && lastIndexed >= this.chainConfig.initialBlockNumber
         ? lastIndexed + 1
         : this.nextBlock;
     const endBlock = Math.min(
       startBlock + this.chainConfig.blockDelta - 1,
-      latestBlockInChain,
+      lastSafeBlock,
     );
     return { startBlock, endBlock };
   }

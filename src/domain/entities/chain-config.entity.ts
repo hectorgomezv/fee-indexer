@@ -6,4 +6,5 @@ export interface ChainConfig {
   blockDelta: number;
   initialBlockNumber: number;
   intervalMs: number;
+  blockConfirmationsThreshold: number;
 }
